@@ -24,7 +24,7 @@ jobs:
         chmod 600 ~/.ssh/known_hosts  # Secure the known hosts file
 
     - name: Deploy to AWS EC2 (SCP)
-      uses: appleboy/scp-action@v0.0.9  # Use stable version of the SCP action
+      uses: appleboy/scp-action@v0.1.6  # Use stable version of the SCP action
       with:
         host: ${{ secrets.REMOTE_HOST }}  # EC2 host (direct server)
         username: ${{ secrets.REMOTE_USER }}  # SSH username for EC2
