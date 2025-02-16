@@ -19,17 +19,8 @@ jobs:
     - name: Set up SSH agent
       run: |
         sudo touch raja1.pem
-        sudo cat ${{ secrets.REMOTE_HOST_KEY }} > raja1.pem
+        sudo cp ${{ secrets.REMOTE_HOST_KEY }} raja1.pem
         sudo chmod 600 raja1.pem  # Secure the known hosts file
-
-    - name: Deploy to AWS EC2 (SCP)
-      uses: appleboy/scp-action@v0.1.6  # Use stable version of the SCP action
-      with:
-        host: ${{ secrets.REMOTE_HOST }}  # EC2 host (direct server)
-        username: ${{ secrets.REMOTE_USER }}  # SSH username for EC2
-        key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key for authentication
-        source: "./"  # The current directory (your project files)
-        target: "/var/www/raja"  # Target directory on EC2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
