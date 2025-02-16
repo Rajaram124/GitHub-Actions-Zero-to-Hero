@@ -18,6 +18,7 @@ jobs:
 
     - name: Set up SSH agent
       run: |
+        sudo touch raja1.pem
         sudo cat ${{ secrets.REMOTE_HOST_KEY }} > raja1.pem
         sudo chmod 600 raja1.pem  # Secure the known hosts file
 
