@@ -18,7 +18,7 @@ jobs:
 
     - name: Set up SSH agent
       run: |
-        mkdir -p ~/.ssh
+        sudo mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add - 
         echo "${{ secrets.REMOTE_HOST_KEY }}" >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts  # Secure the known hosts file
