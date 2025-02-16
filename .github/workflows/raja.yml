@@ -1,0 +1,59 @@
+name: Node.js CI/CD on Amazon Linux
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH agent
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh-add - 
+        echo "${{ secrets.REMOTE_HOST_KEY }}" >> ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts  # Secure the known hosts file
+
+    - name: Deploy to AWS EC2 (SCP)
+      uses: appleboy/scp-action@v0.0.9  # Use stable version of the SCP action
+      with:
+        host: ${{ secrets.REMOTE_HOST }}  # EC2 host (direct server)
+        username: ${{ secrets.REMOTE_USER }}  # SSH username for EC2
+        key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key for authentication
+        source: "./"  # The current directory (your project files)
+        target: "/var/www/raja"  # Target directory on EC2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    - name: Run tests
+      run: |
+        cd /var/www/raja
+        python -m pytest addition.py
+    - name: Restart PM2 application on EC2 (SSH)
+      uses: appleboy/ssh-action@v0.0.9  # Use stable version of the SSH action
+      with:
+        host: ${{ secrets.REMOTE_HOST }}  # EC2 host (direct server)
+        username: ${{ secrets.REMOTE_USER }}  # SSH username for EC2
+        key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH private key for authentication
+        script: |
+          set -e  # Exit immediately on error
+          echo "Successfully connected to EC2 instance"
+          cd /var/www/raja
+          mkdir kingu
+          echo "Deployment and PM2 restart completed successfully"
