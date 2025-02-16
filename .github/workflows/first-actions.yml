@@ -1,8 +1,8 @@
-name: My First GitHub Actions
+#name: My First GitHub Actions
 
-on: [push]
+#on: [push]
 
-jobs:
+#jobs:
   build:
     runs-on: ubuntu-latest
 
